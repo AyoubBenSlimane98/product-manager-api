@@ -1,4 +1,4 @@
-import { integer, primaryKey, foreignKey } from 'drizzle-orm/pg-core';
+import { uuid, primaryKey, foreignKey } from 'drizzle-orm/pg-core';
 import { userManagementSchema } from './schema.db';
 import { usersTable } from './users.schema';
 import { rolesTable } from './roles.schema';
@@ -6,8 +6,8 @@ import { rolesTable } from './roles.schema';
 export const usersToRolesTable = userManagementSchema.table(
   'users_to_roles',
   {
-    user_id: integer('user_id').notNull(),
-    role_id: integer('role_id').notNull(),
+    user_id: uuid('user_id').notNull(),
+    role_id: uuid('role_id').notNull(),
   },
   (table) => [
     primaryKey({

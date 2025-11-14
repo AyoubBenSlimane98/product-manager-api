@@ -8,7 +8,7 @@ export const brandsTable = productManagementSchema.table(
     name: varchar('name', { length: 50 }).notNull(),
   },
   (table) => [
-    primaryKey({ name: 'pk_brands_brand_id', columns: [table.name] }),
+    primaryKey({ name: 'pk_brands_brand_id', columns: [table.brand_id] }),
     unique('uq_brands_name').on(table.name),
   ],
 );

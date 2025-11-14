@@ -3,6 +3,7 @@ import {
   brandsTable,
   categoriesToProductsTable,
   productsTable,
+  usersToProductsTable,
 } from '../schema';
 
 export const productsRelations = relations(productsTable, ({ one, many }) => ({
@@ -12,4 +13,5 @@ export const productsRelations = relations(productsTable, ({ one, many }) => ({
   }),
   product_variants: many(productsTable),
   categoriesToProducts: many(categoriesToProductsTable),
+  usersToProducts: many(usersToProductsTable),
 }));

@@ -14,7 +14,6 @@ export const DATABASE_CONNCTION = 'DATABASE_CONNCTION';
         const pool = new Pool({
           connectionString: config.getOrThrow('database.url'),
         });
-        console.log(schema);
         return drizzle(pool, { schema });
       },
     },
