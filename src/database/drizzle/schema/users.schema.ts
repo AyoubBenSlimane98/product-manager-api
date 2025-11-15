@@ -1,6 +1,7 @@
 import {
   uuid,
   varchar,
+  text,
   timestamp,
   primaryKey,
   unique,
@@ -14,6 +15,7 @@ export const usersTable = userManagementSchema.table(
     username: varchar('username', { length: 50 }).notNull(),
     email: varchar('email').notNull(),
     password: varchar('password', { length: 255 }).notNull(),
+    refresh_token: text('refresh_token'),
     created_at: timestamp('created_at').defaultNow(),
   },
   (table) => [

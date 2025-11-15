@@ -8,6 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { userManagementSchema } from './schema.db';
 import { usersTable } from './users.schema';
+import { timestamp } from 'drizzle-orm/pg-core';
 
 export const profilesTable = userManagementSchema.table(
   'profiles',
@@ -17,6 +18,9 @@ export const profilesTable = userManagementSchema.table(
     first_name: varchar('first_name', { length: 50 }).notNull(),
     last_name: varchar('last_name', { length: 50 }).notNull(),
     avatar_url: text('avatar_url'),
+    updated_ad: timestamp('updated_ad')
+      .defaultNow()
+      .$onUpdateFn(() => new Date()),
   },
   (table) => [
     primaryKey({ name: 'pk_profiles_profile_id', columns: [table.profile_id] }),
