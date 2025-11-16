@@ -11,4 +11,7 @@ export const DevEnvSchema = BaseEnvSchema.extend({
   POSTGRES_PASSWORD: z.string().optional(),
   POSTGRES_DB: z.string().optional(),
   DATABASE_URL: z.string().optional(),
+  CLOUDINARY_CLOUD_NAME: z.string().nonempty(),
+  CLOUDINARY_API_KEY: z.string().nonempty(),
+  CLOUDINARY_API_SECRET: z.string().nonempty(),
 });
