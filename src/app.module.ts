@@ -10,7 +10,7 @@ import { validateEnv } from './config/environment';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { Argon2Module } from './modules/argon2/argon2.module';
+import { Argon2Module } from './modules/auth/argon2/argon2.module';
 
 @Module({
   imports: [
