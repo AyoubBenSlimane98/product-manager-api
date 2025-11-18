@@ -18,7 +18,7 @@ export const DevEnvSchema = BaseEnvSchema.extend({
   CLOUDINARY_API_SECRET: z.string().nonempty(),
   // argon2
   ARGON2_SECRET: z.string().nonempty(),
-  ARGON2_TIME_COST: z.int().nonnegative().default(3),
-  ARGON2_MEMORY_COST: z.int().nonnegative().default(64),
-  ARGON2_PARALLELISM: z.int().nonnegative().default(1),
+  ARGON2_TIME_COST: z.coerce.number().int().nonnegative().default(3),
+  ARGON2_MEMORY_COST: z.coerce.number().int().nonnegative().default(64),
+  ARGON2_PARALLELISM: z.coerce.number().int().nonnegative().default(1),
 });

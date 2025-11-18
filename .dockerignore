@@ -14,7 +14,7 @@ coverage
 
 # Environment files
 .env
-.env.* 
+.env.*
 
 # Config files
 .prettierrc
@@ -26,3 +26,5 @@ README.md
 .temp
 .tmp
 
+keys/
+*.pem

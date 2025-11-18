@@ -5,28 +5,25 @@ import {
   argon2Config,
   cloudinaryConfig,
   databaseConfig,
+  jwtConfig,
 } from './config/configuration';
 import { validateEnv } from './config/environment';
-import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { Argon2Module } from './modules/auth/argon2/argon2.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [databaseConfig, cloudinaryConfig, argon2Config],
+      load: [databaseConfig, cloudinaryConfig, argon2Config, jwtConfig],
       validate: validateEnv,
       expandVariables: true,
       envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`],
     }),
     DatabaseModule,
-    CloudinaryModule,
     UploadModule,
     AuthModule,
-    Argon2Module,
   ],
 })
 export class AppModule {}

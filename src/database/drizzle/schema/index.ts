@@ -6,6 +6,7 @@ export * from './users.schema';
 export * from './usersToRoles.schema';
 export * from './phone.schema';
 export * from './usersToProducts.schema';
+export * from './tokens.schema';
 
 // product manager
 export * from './brands.schema';
