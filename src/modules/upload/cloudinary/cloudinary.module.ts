@@ -1,15 +1,12 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as Cloudinary } from 'cloudinary';
 import { CloudinaryService } from './cloudinary.service';
 
-export const CLOUDINARY = 'cloudinary';
-
-@Global()
 @Module({
   providers: [
     {
-      provide: CLOUDINARY,
+      provide: 'CLOUDINARY',
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         Cloudinary.config({
@@ -23,6 +20,6 @@ export const CLOUDINARY = 'cloudinary';
     },
     CloudinaryService,
   ],
-  exports: [CLOUDINARY, CloudinaryService],
+  exports: ['CLOUDINARY', CloudinaryService],
 })
 export class CloudinaryModule {}
