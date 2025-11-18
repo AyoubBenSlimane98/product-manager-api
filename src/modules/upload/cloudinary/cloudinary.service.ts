@@ -1,12 +1,11 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { v2 as CloudinaryType, UploadApiResponse } from 'cloudinary';
 import { Readable } from 'stream';
-import { CLOUDINARY } from './cloudinary.module';
 
 @Injectable()
 export class CloudinaryService {
   constructor(
-    @Inject(forwardRef(() => CLOUDINARY))
+    @Inject('CLOUDINARY')
     private readonly cloudinary: typeof CloudinaryType,
   ) {}
   async uploadBuffer(buffer: Buffer): Promise<UploadApiResponse> {
