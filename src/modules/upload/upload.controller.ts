@@ -6,11 +6,15 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
-import { UploadService } from './upload.service';
 import multer from 'multer';
+import { Public } from 'src/common/decorator';
+import { LazyModuleLoader, ModuleRef } from '@nestjs/core';
+
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  private uploadModuleRef: ModuleRef;
+  constructor(private readonly lazyModuleLoader: LazyModuleLoader) {}
+  @Public()
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
@@ -19,10 +23,21 @@ export class UploadController {
     }),
   )
   async upload(@UploadedFile() file: Express.Multer.File) {
-    console.time('upload');
-    this.uploadService.validateFile(file);
-    const result = await this.uploadService.uploadImage(file);
-    console.timeEnd('upload');
+    console.time('Upload');
+    if (!this.uploadModuleRef) {
+      const { UploadModule } = await import('./upload.module.js');
+      this.uploadModuleRef = await this.lazyModuleLoader.load(
+        () => UploadModule,
+      );
+    }
+    const { UploadService } = await import('./upload.service.js');
+    const uploadService = this.uploadModuleRef.get(UploadService, {
+      strict: false,
+    });
+
+    uploadService.validateFile(file);
+    const result = await uploadService.uploadImage(file);
+    console.timeEnd('Upload');
     return result;
   }
 }

@@ -8,8 +8,10 @@ import {
   jwtConfig,
 } from './config/configuration';
 import { validateEnv } from './config/environment';
-import { UploadModule } from './modules/upload/upload.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './modules/auth/guard/jwt.guard';
+import { UploadController } from './modules/upload/upload.controller';
 
 @Module({
   imports: [
@@ -22,8 +24,14 @@ import { AuthModule } from './modules/auth/auth.module';
       envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`],
     }),
     DatabaseModule,
-    UploadModule,
     AuthModule,
+  ],
+  controllers: [UploadController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}
