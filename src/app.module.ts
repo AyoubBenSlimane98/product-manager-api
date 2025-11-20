@@ -12,6 +12,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guard/jwt.guard';
 import { UploadController } from './modules/upload/upload.controller';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UploadController } from './modules/upload/upload.controller';
     }),
     DatabaseModule,
     AuthModule,
+    RolesModule,
   ],
   controllers: [UploadController],
   providers: [
