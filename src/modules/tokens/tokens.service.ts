@@ -27,11 +27,20 @@ export class TokensService {
   ) {
     try {
       const hashed = await this.argon.hashData(rt);
-      await (tx || this.db).insert(this.Tokens).values({
-        user_id,
-        hash_token: hashed,
-        expires_at: sql`CURRENT_TIMESTAMP + INTERVAL '7 days'`,
-      });
+      await (tx || this.db)
+        .insert(this.Tokens)
+        .values({
+          user_id,
+          hash_token: hashed,
+          expires_at: sql`CURRENT_TIMESTAMP + INTERVAL '7 days'`,
+        })
+        .onConflictDoUpdate({
+          target: this.Tokens.user_id,
+          set: {
+            hash_token: hashed,
+            expires_at: sql`CURRENT_TIMESTAMP + INTERVAL '7 days'`,
+          },
+        });
     } catch (error) {
       if (error instanceof DatabaseError && error.code === '23503') {
         throw new ConflictException('User alreay sign up and have token');

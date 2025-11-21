@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import {
@@ -9,11 +14,13 @@ import {
 } from './config/configuration';
 import { validateEnv } from './config/environment';
 import { AuthModule } from './modules/auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './modules/auth/guard/jwt.guard';
 import { UploadController } from './modules/upload/upload.controller';
 import { RolesModule } from './modules/roles/roles.module';
 import { TokensModule } from './modules/tokens/tokens.module';
+import { AuthJwtModule } from './modules/auth/jwt/jwt.module';
+import { JwtAuthGuard } from './common/guard';
+import { JwtAuthMiddleware } from './common/middleware';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -29,6 +36,7 @@ import { TokensModule } from './modules/tokens/tokens.module';
     AuthModule,
     RolesModule,
     TokensModule,
+    AuthJwtModule,
   ],
   controllers: [UploadController],
   providers: [
@@ -38,4 +46,17 @@ import { TokensModule } from './modules/tokens/tokens.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtAuthMiddleware)
+      .exclude(
+        { path: '/auth/local/signup', method: RequestMethod.POST },
+        { path: '/auth/local/login', method: RequestMethod.POST },
+        { path: '/auth/rest-password/request', method: RequestMethod.POST },
+        { path: '/auth/rest-password/confirm', method: RequestMethod.POST },
+        { path: '/roles', method: RequestMethod.POST },
+      )
+      .forRoutes('*');
+  }
+}

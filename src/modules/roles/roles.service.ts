@@ -31,6 +31,9 @@ export class RolesService {
   private get UsersToRoles() {
     return schema.usersToRolesTable;
   }
+  private useDB(tx?: NodePgTransaction<any, any>) {
+    return tx ?? this.db;
+  }
   async getAllRoles(): Promise<AllRolesResponse> {
     try {
       const allRoles = await this.db
@@ -49,12 +52,13 @@ export class RolesService {
       throw new InternalServerErrorException('Unexpected error');
     }
   }
+
   async getRole(
     name: string,
     tx?: NodePgTransaction<any, any>,
   ): Promise<GetRoleResponse> {
     try {
-      const [role] = await (tx || this.db)
+      const [role] = await this.useDB(tx)
         .select({ role_id: this.Roles.role_id, name: this.Roles.name })
         .from(this.Roles)
         .where(eq(this.Roles.name, name.toUpperCase()));
@@ -67,6 +71,25 @@ export class RolesService {
       };
     } catch (error) {
       console.error('Error in getRole:', error);
+      throw new InternalServerErrorException('Unexpected error');
+    }
+  }
+  async getRolesOfUser(user_id: string, tx?: NodePgTransaction<any, any>) {
+    try {
+      const userRoles = await this.useDB(tx)
+        .select({ name: this.Roles.name })
+        .from(this.UsersToRoles)
+        .innerJoin(
+          this.Roles,
+          eq(this.UsersToRoles.role_id, this.Roles.role_id),
+        )
+        .where(eq(this.UsersToRoles.user_id, user_id));
+      return {
+        user_id,
+        roles: userRoles,
+      };
+    } catch (error) {
+      console.error(error);
       throw new InternalServerErrorException('Unexpected error');
     }
   }

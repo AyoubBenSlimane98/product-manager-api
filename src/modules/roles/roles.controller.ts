@@ -34,6 +34,12 @@ export class RolesController {
   async getRole(@Query('name') name: string): Promise<GetRoleResponse> {
     return this.rolesService.getRole(name);
   }
+
+  @Get(':user_id')
+  async getRolesOfUser(@Param('user_id', new ParseUUIDPipe()) user_id: string) {
+    return this.rolesService.getRolesOfUser(user_id);
+  }
+
   @Public()
   @Post()
   async createRole(@Body() dto: CreateRoleDto): Promise<CreateRoleReponse> {

@@ -11,5 +11,5 @@ export const usersRelations = relations(usersTable, ({ one, many }) => ({
   profiles: one(profilesTable),
   usersToRoles: many(usersToRolesTable),
   usersToProducts: many(usersToProductsTable),
-  tokens: many(tokensTable),
+  token: one(tokensTable),
 }));

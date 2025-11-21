@@ -3,16 +3,22 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Argon2Service } from './argon2/argon2.service';
 import { AuthJwtService } from './jwt/jwt.service';
 import * as schema from '../../database/drizzle/schema';
-import { LocalSignupDto } from './dto';
+import { LocalLoginDto, LocalSignupDto } from './dto';
 import { RolesService } from '../roles/roles.service';
 import { DatabaseError } from 'pg';
 import { TokensService } from '../tokens/tokens.service';
-import { LocalSignupResponse } from './types';
+import {
+  LocalLoginResponse,
+  LocalSignupResponse,
+  LogoutResponse,
+} from './types';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +31,9 @@ export class AuthService {
     private readonly tokensService: TokensService,
   ) {}
   private get Users() {
+    return schema.usersTable;
+  }
+  private get Tokens() {
     return schema.usersTable;
   }
   async localSignup(dto: LocalSignupDto): Promise<LocalSignupResponse> {
@@ -77,9 +86,70 @@ export class AuthService {
     }
   }
 
-  async localLogin() {}
+  async localLogin(dto: LocalLoginDto): Promise<LocalLoginResponse> {
+    const { email, password } = dto;
+    return this.db.transaction(async (tx) => {
+      const [user] = await tx
+        .select({
+          user_id: this.Users.user_id,
+          email: this.Users.email,
+          hashPassword: this.Users.password,
+        })
+        .from(this.Users)
+        .where(eq(this.Users.email, email))
+        .limit(1);
+      if (!user) {
+        throw new UnauthorizedException('Email or password is incorrect');
+      }
 
-  async logout() {}
+      const isMatched = await this.argon.verifyData(
+        user.hashPassword,
+        password,
+      );
+      if (!isMatched) {
+        throw new UnauthorizedException('Email or password is incorrect');
+      }
+
+      const rolesResult = await this.rolesService.getRolesOfUser(
+        user.user_id,
+        tx,
+      );
+      const roles = rolesResult.roles.map((r) => r.name);
+
+      const tokens = await this.jwt.generateTokens({
+        user_id: user.user_id,
+        roles: roles,
+      });
+
+      await this.tokensService.storeToken(
+        {
+          user_id: user.user_id,
+          rt: tokens.refresh_token,
+        },
+        tx,
+      );
+
+      return {
+        message: 'Logging successfully',
+        user_id: user.user_id,
+        tokens,
+      };
+    });
+  }
+
+  async logout(user_id: string): Promise<LogoutResponse> {
+    const deleteResult = await this.db
+      .delete(this.Tokens)
+      .where(eq(this.Tokens.user_id, user_id));
+
+    return {
+      message:
+        deleteResult.rowCount !== 0
+          ? 'Logout successfully'
+          : 'No active session found',
+      user_id,
+    };
+  }
 
   async refresh() {}
 
