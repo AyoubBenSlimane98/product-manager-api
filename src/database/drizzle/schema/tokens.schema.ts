@@ -6,6 +6,7 @@ import {
   primaryKey,
   foreignKey,
   unique,
+  index,
 } from 'drizzle-orm/pg-core';
 import { userManagementSchema } from './schema.db';
 import { usersTable } from './users.schema';
@@ -13,11 +14,10 @@ import { usersTable } from './users.schema';
 export const tokensTable = userManagementSchema.table(
   'tokens',
   {
-    token_id: uuid('token_id').defaultRandom(),
+    token_id: uuid('token_id').defaultRandom().notNull(),
     user_id: uuid('user_id').notNull(),
-    refresh_token: text('refresh_token').notNull(),
-    device_info: text('device_info'),
-    expires_at: timestamp('expires_at').notNull(),
+    hash_token: text('hash_token').notNull(),
+    expires_at: timestamp('expires_at', { withTimezone: true }).notNull(),
     is_revoked: boolean('is_revoked').default(false),
     created_at: timestamp('created_at').defaultNow(),
   },
@@ -27,7 +27,8 @@ export const tokensTable = userManagementSchema.table(
       name: 'fk_tokens_user_id_users_user_id',
       columns: [table.user_id],
       foreignColumns: [usersTable.user_id],
-    }),
-    unique('uq_tokens_refresh_token').on(table.refresh_token),
+    }).onDelete('cascade'),
+    unique('uq_tokens_hash_token').on(table.hash_token),
+    index('idx_tokens_user_id').on(table.user_id),
   ],
 );

@@ -14,7 +14,7 @@ import {
   GetRoleResponse,
   UpdateRoleResponse,
 } from './types';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { NodePgDatabase, NodePgTransaction } from 'drizzle-orm/node-postgres';
 import * as schema from '../../database/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { DatabaseError } from 'pg';
@@ -22,7 +22,8 @@ import { DatabaseError } from 'pg';
 @Injectable()
 export class RolesService {
   constructor(
-    @Inject('DATABASE_CONNCTION') private readonly db: NodePgDatabase,
+    @Inject('DATABASE_CONNCTION')
+    private readonly db: NodePgDatabase<typeof schema>,
   ) {}
   private get Roles() {
     return schema.rolesTable;
@@ -48,9 +49,12 @@ export class RolesService {
       throw new InternalServerErrorException('Unexpected error');
     }
   }
-  async getRole(name: string): Promise<GetRoleResponse> {
+  async getRole(
+    name: string,
+    tx?: NodePgTransaction<any, any>,
+  ): Promise<GetRoleResponse> {
     try {
-      const [role] = await this.db
+      const [role] = await (tx || this.db)
         .select({ role_id: this.Roles.role_id, name: this.Roles.name })
         .from(this.Roles)
         .where(eq(this.Roles.name, name.toUpperCase()));
@@ -91,10 +95,15 @@ export class RolesService {
     }
   }
 
-  async assignRole(dto: AssignRoleDto): Promise<AssignRoleResponse> {
+  async assignRole(
+    dto: AssignRoleDto,
+    tx?: NodePgTransaction<any, any>,
+  ): Promise<AssignRoleResponse> {
     const { user_id, role_id } = dto;
     try {
-      await this.db.insert(this.UsersToRoles).values({ user_id, role_id });
+      await (tx || this.db)
+        .insert(this.UsersToRoles)
+        .values({ user_id, role_id });
       return {
         message: 'Role assigned successfully',
       };

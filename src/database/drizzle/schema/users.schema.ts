@@ -10,7 +10,7 @@ import { userManagementSchema } from './schema.db';
 export const usersTable = userManagementSchema.table(
   'users',
   {
-    user_id: uuid('user_id').defaultRandom(),
+    user_id: uuid('user_id').defaultRandom().notNull(),
     username: varchar('username', { length: 50 }).notNull(),
     email: varchar('email').notNull(),
     password: varchar('password', { length: 255 }).notNull(),

@@ -19,6 +19,7 @@ import {
   AllRolesResponse,
   GetRoleResponse,
 } from './types';
+import { Public } from 'src/common/decorator';
 
 @Controller('roles')
 export class RolesController {
@@ -33,7 +34,7 @@ export class RolesController {
   async getRole(@Query('name') name: string): Promise<GetRoleResponse> {
     return this.rolesService.getRole(name);
   }
-
+  @Public()
   @Post()
   async createRole(@Body() dto: CreateRoleDto): Promise<CreateRoleReponse> {
     return this.rolesService.createRole(dto);

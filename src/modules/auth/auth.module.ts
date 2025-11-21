@@ -5,6 +5,8 @@ import { Argon2Module } from './argon2/argon2.module';
 import { AuthJwtModule } from './jwt/jwt.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RolesModule } from '../roles/roles.module';
+import { TokensModule } from '../tokens/tokens.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ConfigService } from '@nestjs/config';
     }),
     AuthJwtModule,
     Argon2Module,
+    RolesModule,
+    TokensModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
