@@ -21,4 +21,7 @@ export const DevEnvSchema = BaseEnvSchema.extend({
   ARGON2_TIME_COST: z.coerce.number().int().nonnegative().default(3),
   ARGON2_MEMORY_COST: z.coerce.number().int().nonnegative().default(64),
   ARGON2_PARALLELISM: z.coerce.number().int().nonnegative().default(1),
+  // sendGrid
+  SENDGRID_API_KEY: z.string().nonempty(),
+  SENDGRID_EMAIL: z.string().nonempty(),
 });

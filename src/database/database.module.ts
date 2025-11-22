@@ -3,12 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './drizzle';
-export const DATABASE_CONNCTION = 'DATABASE_CONNCTION';
+
 @Global()
 @Module({
   providers: [
     {
-      provide: DATABASE_CONNCTION,
+      provide: 'DATABASE_CONNCTION',
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const pool = new Pool({
@@ -18,6 +18,6 @@ export const DATABASE_CONNCTION = 'DATABASE_CONNCTION';
       },
     },
   ],
-  exports: [DATABASE_CONNCTION],
+  exports: ['DATABASE_CONNCTION'],
 })
 export class DatabaseModule {}

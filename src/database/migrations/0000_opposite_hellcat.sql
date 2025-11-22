@@ -45,8 +45,10 @@ CREATE TABLE "product_management"."colors" (
 CREATE TABLE "product_management"."images" (
 	"image_id" uuid DEFAULT gen_random_uuid(),
 	"variant_id" uuid NOT NULL,
+	"public_id" text NOT NULL,
 	"url" text NOT NULL,
-	CONSTRAINT "pk_images_variant_id" PRIMARY KEY("variant_id")
+	"created_at" timestamp DEFAULT now(),
+	CONSTRAINT "pk_images_image_id" PRIMARY KEY("image_id")
 );
 --> statement-breakpoint
 CREATE TABLE "user_management"."profiles" (
@@ -55,19 +57,23 @@ CREATE TABLE "user_management"."profiles" (
 	"first_name" varchar(50) NOT NULL,
 	"last_name" varchar(50) NOT NULL,
 	"avatar_url" text,
+	"updated_ad" timestamp DEFAULT now(),
 	CONSTRAINT "pk_profiles_profile_id" PRIMARY KEY("profile_id"),
 	CONSTRAINT "uq_profiles_user_id" UNIQUE("user_id")
 );
 --> statement-breakpoint
 CREATE TABLE "user_management"."roles" (
-	"role_id" uuid DEFAULT gen_random_uuid(),
+	"role_id" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar NOT NULL,
+	"description" text,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "pk_roles_role_id" PRIMARY KEY("role_id"),
 	CONSTRAINT "uq_roles_name" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "user_management"."users" (
-	"user_id" uuid DEFAULT gen_random_uuid(),
+	"user_id" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"username" varchar(50) NOT NULL,
 	"email" varchar NOT NULL,
 	"password" varchar(255) NOT NULL,
@@ -79,6 +85,7 @@ CREATE TABLE "user_management"."users" (
 CREATE TABLE "user_management"."users_to_roles" (
 	"user_id" uuid NOT NULL,
 	"role_id" uuid NOT NULL,
+	"assigned_at" timestamp DEFAULT now(),
 	CONSTRAINT "pk_users_to_roles_user_id_role_id" PRIMARY KEY("user_id","role_id")
 );
 --> statement-breakpoint
@@ -101,6 +108,17 @@ CREATE TABLE "user_management"."users_to_products" (
 	"purchase_date" timestamp DEFAULT now(),
 	"quantity" integer NOT NULL,
 	CONSTRAINT "pk_users_to_products_user_id_product_id_purchase_date" PRIMARY KEY("user_id","product_id","purchase_date")
+);
+--> statement-breakpoint
+CREATE TABLE "user_management"."tokens" (
+	"token_id" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"hash_token" text NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"is_revoked" boolean DEFAULT false,
+	"created_at" timestamp DEFAULT now(),
+	CONSTRAINT "pk_tokens_token_id" PRIMARY KEY("token_id"),
+	CONSTRAINT "uq_tokens_hash_token" UNIQUE("hash_token")
 );
 --> statement-breakpoint
 CREATE TABLE "product_management"."products" (
@@ -140,13 +158,17 @@ ALTER TABLE "product_management"."categories_to_products" ADD CONSTRAINT "fk_cat
 ALTER TABLE "product_management"."categories_to_products" ADD CONSTRAINT "fk_categories_to_products_product_id_products_product_id" FOREIGN KEY ("product_id") REFERENCES "product_management"."products"("product_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_management"."images" ADD CONSTRAINT "fk_images_variant_id_product_variants_variant_id" FOREIGN KEY ("variant_id") REFERENCES "product_management"."product_variants"("variant_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_management"."profiles" ADD CONSTRAINT "fk_profiles_user_id_users_user_id" FOREIGN KEY ("user_id") REFERENCES "user_management"."users"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_management"."users_to_roles" ADD CONSTRAINT "fk_users_to_roles_user_id_users_user_id" FOREIGN KEY ("user_id") REFERENCES "user_management"."users"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_management"."users_to_roles" ADD CONSTRAINT "fk_users_to_roles_role_id_roles_role_id" FOREIGN KEY ("role_id") REFERENCES "user_management"."roles"("role_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_management"."users_to_roles" ADD CONSTRAINT "fk_users_to_roles_user_id_users_user_id" FOREIGN KEY ("user_id") REFERENCES "user_management"."users"("user_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_management"."users_to_roles" ADD CONSTRAINT "fk_users_to_roles_role_id_roles_role_id" FOREIGN KEY ("role_id") REFERENCES "user_management"."roles"("role_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_management"."phones" ADD CONSTRAINT "fk_phones_profile_id_profiles_profile_id" FOREIGN KEY ("profile_id") REFERENCES "user_management"."profiles"("profile_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_management"."users_to_products" ADD CONSTRAINT "fk_users_to_products_user_id_users_user_id" FOREIGN KEY ("user_id") REFERENCES "user_management"."users"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_management"."users_to_products" ADD CONSTRAINT "fk_users_to_products_product_id_products_product_id" FOREIGN KEY ("product_id") REFERENCES "product_management"."products"("product_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_management"."tokens" ADD CONSTRAINT "fk_tokens_user_id_users_user_id" FOREIGN KEY ("user_id") REFERENCES "user_management"."users"("user_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_management"."products" ADD CONSTRAINT "fk_products_brand_id_brands_brand_id" FOREIGN KEY ("brand_id") REFERENCES "product_management"."brands"("brand_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_management"."product_variants" ADD CONSTRAINT "fk_product_variants_product_id_products_product_id" FOREIGN KEY ("product_id") REFERENCES "product_management"."products"("product_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_management"."product_variants" ADD CONSTRAINT "fk_product_variants_color_id_colors_color_id" FOREIGN KEY ("color_id") REFERENCES "product_management"."colors"("color_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_management"."product_variants" ADD CONSTRAINT "fk_product_variants_size_id_sizes_size_id" FOREIGN KEY ("size_id") REFERENCES "product_management"."sizes"("size_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "product_management"."stocks" ADD CONSTRAINT "fk_stocks_variant_id_product_variants_variant_id" FOREIGN KEY ("variant_id") REFERENCES "product_management"."product_variants"("variant_id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "product_management"."stocks" ADD CONSTRAINT "fk_stocks_variant_id_product_variants_variant_id" FOREIGN KEY ("variant_id") REFERENCES "product_management"."product_variants"("variant_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "idx_roles_name" ON "user_management"."roles" USING btree ("name");--> statement-breakpoint
+CREATE INDEX "idx_roles_ created_at" ON "user_management"."roles" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "idx_tokens_user_id" ON "user_management"."tokens" USING btree ("user_id");
