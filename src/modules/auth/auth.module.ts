@@ -9,6 +9,7 @@ import { RolesModule } from '../roles/roles.module';
 import { TokensModule } from '../tokens/tokens.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { MailModule } from './send-grid/mail.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     Argon2Module,
     RolesModule,
     TokensModule,
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

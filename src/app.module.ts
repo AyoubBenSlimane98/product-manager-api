@@ -11,6 +11,7 @@ import {
   cloudinaryConfig,
   databaseConfig,
   jwtConfig,
+  sendGridConfig,
 } from './config/configuration';
 import { validateEnv } from './config/environment';
 import { AuthModule } from './modules/auth/auth.module';
@@ -27,7 +28,13 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [databaseConfig, cloudinaryConfig, argon2Config, jwtConfig],
+      load: [
+        databaseConfig,
+        cloudinaryConfig,
+        argon2Config,
+        jwtConfig,
+        sendGridConfig,
+      ],
       validate: validateEnv,
       expandVariables: true,
       envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`],

@@ -4,6 +4,7 @@ import {
   timestamp,
   primaryKey,
   unique,
+  index,
 } from 'drizzle-orm/pg-core';
 import { userManagementSchema } from './schema.db';
 
@@ -19,5 +20,7 @@ export const usersTable = userManagementSchema.table(
   (table) => [
     primaryKey({ name: 'pk_users_user_id', columns: [table.user_id] }),
     unique('uq_users_email').on(table.email),
+    index('idx_users_email').on(table.email),
+    index('idx_users_password').on(table.password),
   ],
 );
