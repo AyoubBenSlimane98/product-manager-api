@@ -58,3 +58,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Docker volumes
 pgdata/
+
+# keys pem
+keys/
+*.pem

@@ -6,6 +6,8 @@ export * from './users.relation';
 export * from './roles.relations';
 export * from './usersToRoles.relation';
 export * from './usersToProducts.relation';
+export * from './tokens.relation';
+export * from './passwordResetTokens.relation';
 
 // product manager
 export * from './brands.relation';

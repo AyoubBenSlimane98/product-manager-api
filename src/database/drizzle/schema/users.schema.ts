@@ -1,25 +1,26 @@
 import {
   uuid,
   varchar,
-  text,
   timestamp,
   primaryKey,
   unique,
+  index,
 } from 'drizzle-orm/pg-core';
 import { userManagementSchema } from './schema.db';
 
 export const usersTable = userManagementSchema.table(
   'users',
   {
-    user_id: uuid('user_id').defaultRandom(),
+    user_id: uuid('user_id').defaultRandom().notNull(),
     username: varchar('username', { length: 50 }).notNull(),
     email: varchar('email').notNull(),
     password: varchar('password', { length: 255 }).notNull(),
-    refresh_token: text('refresh_token'),
     created_at: timestamp('created_at').defaultNow(),
   },
   (table) => [
     primaryKey({ name: 'pk_users_user_id', columns: [table.user_id] }),
     unique('uq_users_email').on(table.email),
+    index('idx_users_email').on(table.email),
+    index('idx_users_password').on(table.password),
   ],
 );
