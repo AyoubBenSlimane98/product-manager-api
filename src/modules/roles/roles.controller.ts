@@ -9,7 +9,6 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { RolesService } from './roles.service';
 import { AssignRoleDto, CreateRoleDto, UpdateRoleDto } from './dto';
 import {
   CreateRoleReponse,
@@ -19,8 +18,10 @@ import {
   AllRolesResponse,
   GetRoleResponse,
 } from './types';
-import { Public } from 'src/common/decorator';
+import { Role, Roles } from 'src/common/decorator';
+import { RolesService } from './roles.service';
 
+@Roles(Role.ADMIN)
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
@@ -30,7 +31,7 @@ export class RolesController {
     return this.rolesService.getAllRoles();
   }
 
-  @Get()
+  @Get('search')
   async getRole(@Query('name') name: string): Promise<GetRoleResponse> {
     return this.rolesService.getRole(name);
   }
@@ -40,7 +41,6 @@ export class RolesController {
     return this.rolesService.getRolesOfUser(user_id);
   }
 
-  @Public()
   @Post()
   async createRole(@Body() dto: CreateRoleDto): Promise<CreateRoleReponse> {
     return this.rolesService.createRole(dto);

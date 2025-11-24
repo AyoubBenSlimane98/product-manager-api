@@ -15,13 +15,12 @@ import {
 } from './config/configuration';
 import { validateEnv } from './config/environment';
 import { AuthModule } from './modules/auth/auth.module';
-import { UploadController } from './modules/upload/upload.controller';
-import { RolesModule } from './modules/roles/roles.module';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { AuthJwtModule } from './modules/auth/jwt/jwt.module';
-import { JwtAuthGuard } from './common/guard';
+import { JwtAuthGuard, RolesGuard } from './common/guard';
 import { JwtAuthMiddleware } from './common/middleware';
 import { APP_GUARD } from '@nestjs/core';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -41,15 +40,18 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     DatabaseModule,
     AuthModule,
-    RolesModule,
     TokensModule,
     AuthJwtModule,
+    UploadModule,
   ],
-  controllers: [UploadController],
   providers: [
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })
