@@ -30,7 +30,6 @@ export class UploadService {
     const compressed = await sharp(file.buffer)
       .jpeg({ quality: 70 })
       .toBuffer();
-
     return await this.cloud.uploadBuffer(compressed);
   }
 }

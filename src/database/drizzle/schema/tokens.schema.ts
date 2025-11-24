@@ -28,6 +28,7 @@ export const tokensTable = userManagementSchema.table(
       columns: [table.user_id],
       foreignColumns: [usersTable.user_id],
     }).onDelete('cascade'),
+    unique('uq_tokens_user_id').on(table.user_id),
     unique('uq_tokens_hash_token').on(table.hash_token),
     index('idx_tokens_user_id').on(table.user_id),
   ],
