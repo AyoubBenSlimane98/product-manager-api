@@ -2,6 +2,7 @@ import {
   uuid,
   varchar,
   timestamp,
+  boolean,
   primaryKey,
   unique,
   index,
@@ -15,7 +16,11 @@ export const usersTable = userManagementSchema.table(
     username: varchar('username', { length: 50 }).notNull(),
     email: varchar('email').notNull(),
     password: varchar('password', { length: 255 }).notNull(),
+    is_blocked: boolean('is_blocked').default(false),
     created_at: timestamp('created_at').defaultNow(),
+    updated_at: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdateFn(() => new Date()),
   },
   (table) => [
     primaryKey({ name: 'pk_users_user_id', columns: [table.user_id] }),

@@ -21,6 +21,7 @@ import { JwtAuthGuard, RolesGuard } from './common/guard';
 import { JwtAuthMiddleware } from './common/middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { UploadModule } from './modules/upload/upload.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { UploadModule } from './modules/upload/upload.module';
     TokensModule,
     AuthJwtModule,
     UploadModule,
+    UsersModule,
   ],
   providers: [
     {
