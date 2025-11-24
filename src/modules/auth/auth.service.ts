@@ -171,6 +171,7 @@ export class AuthService {
     const [tokenResult] = await this.db
       .select({
         hash_token: this.Tokens.hash_token,
+        is_revoked: this.Tokens.is_revoked,
         expires_at: this.Tokens.expires_at,
       })
       .from(this.Tokens)
@@ -181,6 +182,9 @@ export class AuthService {
     }
     if (new Date(tokenResult.expires_at) < new Date()) {
       throw new UnauthorizedException('Refresh token expired');
+    }
+    if (tokenResult.is_revoked) {
+      throw new UnauthorizedException('Refresh token is revoked');
     }
     const isMatched = await this.argon.verifyData(
       tokenResult.hash_token,
