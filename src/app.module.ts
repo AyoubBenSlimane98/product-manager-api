@@ -22,6 +22,8 @@ import { JwtAuthMiddleware } from './common/middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { UploadModule } from './modules/upload/upload.module';
 import { UsersModule } from './modules/users/users.module';
+import { ProfilesModule } from './modules/profiles/profiles.module';
+import { PhonesModule } from './modules/phones/phones.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { UsersModule } from './modules/users/users.module';
     AuthJwtModule,
     UploadModule,
     UsersModule,
+    ProfilesModule,
+    PhonesModule,
   ],
   providers: [
     {
