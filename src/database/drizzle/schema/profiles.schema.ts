@@ -5,6 +5,7 @@ import {
   primaryKey,
   foreignKey,
   unique,
+  index,
 } from 'drizzle-orm/pg-core';
 import { userManagementSchema } from './schema.db';
 import { usersTable } from './users.schema';
@@ -13,7 +14,7 @@ import { timestamp } from 'drizzle-orm/pg-core';
 export const profilesTable = userManagementSchema.table(
   'profiles',
   {
-    profile_id: uuid('profile_id').defaultRandom(),
+    profile_id: uuid('profile_id').defaultRandom().notNull(),
     user_id: uuid('user_id').notNull(),
     first_name: varchar('first_name', { length: 50 }).notNull(),
     last_name: varchar('last_name', { length: 50 }).notNull(),
@@ -28,7 +29,12 @@ export const profilesTable = userManagementSchema.table(
       name: 'fk_profiles_user_id_users_user_id',
       columns: [table.user_id],
       foreignColumns: [usersTable.user_id],
-    }),
+    }).onDelete('cascade'),
     unique('uq_profiles_user_id').on(table.user_id),
+    index('idx_profiles_first_name_last_name').on(
+      table.first_name,
+      table.last_name,
+    ),
+    index('idx_profiles_user_id').on(table.user_id),
   ],
 );
