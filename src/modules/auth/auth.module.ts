@@ -10,6 +10,7 @@ import { TokensModule } from '../tokens/tokens.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { MailModule } from './send-grid/mail.module';
+import { ProfilesModule } from '../profiles/profiles.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MailModule } from './send-grid/mail.module';
     RolesModule,
     TokensModule,
     MailModule,
+    ProfilesModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

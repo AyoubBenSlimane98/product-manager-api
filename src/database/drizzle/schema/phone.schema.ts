@@ -16,7 +16,7 @@ export const typePhoneEnum = pgEnum('typePhone', ['mobile', 'home', 'work']);
 export const phonesTable = userManagementSchema.table(
   'phones',
   {
-    phone_id: uuid('phone_id').defaultRandom(),
+    phone_id: uuid('phone_id').defaultRandom().notNull(),
     profile_id: uuid('profile_id').notNull(),
     country_code: varchar('country_code', { length: 5 }).notNull(),
     phone_number: varchar('phone_number', { length: 20 }).notNull(),
@@ -31,7 +31,7 @@ export const phonesTable = userManagementSchema.table(
       name: 'fk_phones_profile_id_profiles_profile_id',
       columns: [table.profile_id],
       foreignColumns: [profilesTable.profile_id],
-    }),
+    }).onDelete('cascade'),
     unique('uq_phones_country_code_phone_number').on(
       table.country_code,
       table.phone_number,

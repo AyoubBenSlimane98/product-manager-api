@@ -28,6 +28,7 @@ import {
 } from './types';
 import { eq, sql } from 'drizzle-orm';
 import { MailService } from './send-grid/mail.service';
+import { ProfilesService } from '../profiles/profiles.service';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +40,7 @@ export class AuthService {
     private readonly rolesService: RolesService,
     private readonly tokensService: TokensService,
     private readonly mailService: MailService,
+    private readonly profilesService: ProfilesService,
   ) {}
   private get Users() {
     return schema.usersTable;
@@ -50,7 +52,7 @@ export class AuthService {
     return schema.passwordResetTokensTable;
   }
   async localSignup(dto: LocalSignupDto): Promise<LocalSignupResponse> {
-    const { username, email, password } = dto;
+    const { username, email, password, first_name, last_name } = dto;
 
     try {
       return await this.db.transaction(async (tx) => {
@@ -82,6 +84,14 @@ export class AuthService {
           {
             user_id: user.user_id,
             rt: tokens.refresh_token,
+          },
+          tx,
+        );
+        await this.profilesService.createProfile(
+          {
+            user_id: user.user_id,
+            first_name,
+            last_name,
           },
           tx,
         );
